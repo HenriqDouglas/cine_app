@@ -1,4 +1,5 @@
 import 'package:cine_app/Telas/Carrinho.dart';
+import 'package:cine_app/Telas/Detalhes.dart';
 import 'package:cine_app/Telas/Perfil.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -21,6 +22,13 @@ class _HomeState extends State<Home> {
     Navigator.push(
         context,
         MaterialPageRoute(builder: (context)=>Carrinho())
+    );
+  }
+
+  _abrirDetalhes(){
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context)=>Detalhes())
     );
   }
 
@@ -148,6 +156,7 @@ class _HomeState extends State<Home> {
                               size: 40,
                             ),
                           ),
+                          onTap: _abrirDetalhes,
                         ),
                         GestureDetector(
                           child: Padding(
