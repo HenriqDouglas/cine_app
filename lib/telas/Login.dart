@@ -1,5 +1,8 @@
 import 'package:cine_app/Telas/Home.dart';
+import 'package:cine_app/controller/Banco.dart';
+import 'package:cine_app/model/Usuario.dart';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -8,10 +11,68 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
 
+  TextEditingController _controllerUsuario = TextEditingController();
+  TextEditingController _controllerSenha = TextEditingController();
+  String _mensagemErro = "";
+
+  _validarCampos(){
+
+    String usuario = _controllerUsuario.text;
+    String senha = _controllerSenha.text;
+
+    if( usuario.isNotEmpty ){
+
+      if ( senha.isNotEmpty ){
+
+        _validarUsuario();
+
+      } else {
+        setState(() {
+          _mensagemErro = "Por favor preencha a senha";
+        });
+      }
+
+    } else {
+      setState(() {
+        _mensagemErro = "Por favor preencha o usuário";
+      });
+    }
+
+  }
+
+  _validarUsuario() async{
+
+    String usuario = _controllerUsuario.text;
+    String senha = _controllerSenha.text;
+
+    Database db = await Banco().recuperarBancoDados();
+
+    String sql = "SELECT * FROM usuarios WHERE usuario = '$usuario'";
+    List usuarios = await db.rawQuery(sql);
+
+    if(usuarios.isNotEmpty){
+
+      if (senha == usuarios[0]['senha']){
+        _fazerLogin();
+      } else {
+        setState(() {
+          _mensagemErro = "Senha incorreta";
+        });
+      }
+
+    } else {
+      setState(() {
+        _mensagemErro = "Usuário inexistente";
+      });
+    }
+
+  }
+
   void _fazerLogin(){
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context)=> Home()),
+        (_) => false
     );
   }
 
@@ -58,6 +119,7 @@ class _LoginState extends State<Login> {
               child: Container(
                 width: 310,
                 child: TextField(
+                  controller: _controllerUsuario,
                   decoration: InputDecoration(
                       labelText: "USUÁRIO",
                       labelStyle: TextStyle(
@@ -68,6 +130,7 @@ class _LoginState extends State<Login> {
                           fontFamily: "WorkSans"
                       ),
                   ),
+                  onEditingComplete: _validarCampos,
                 ),
               ),
             ),
@@ -78,6 +141,7 @@ class _LoginState extends State<Login> {
                 width: 310,
                 child: TextField(
                   obscureText: true,
+                  controller: _controllerSenha,
                   decoration: InputDecoration(
                     labelText: "SENHA",
                     labelStyle: TextStyle(
@@ -88,7 +152,7 @@ class _LoginState extends State<Login> {
                         fontFamily: "WorkSans"
                     ),
                   ),
-                  onEditingComplete: _fazerLogin,
+                  onEditingComplete: _validarCampos,
                 ),
               ),
             ),
@@ -109,9 +173,29 @@ class _LoginState extends State<Login> {
               ),
             ),
             Positioned(
+              top: 490,
+              left: MediaQuery.of(context).size.width/10,
+              child: Container(
+                height: 50,
+                width: 310,
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  _mensagemErro,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.red,
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: "WorkSans"
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
               top: 540,
               child: GestureDetector(
-              onTap: _fazerLogin,
+              onTap: _validarCampos,
                 child: Container(
                   constraints: BoxConstraints.tightForFinite(
                     width: MediaQuery.of(context).size.width,

@@ -1,3 +1,4 @@
+import 'package:cine_app/Telas/Cadastro.dart';
 import 'package:cine_app/Telas/Login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,13 @@ class _MainState extends State<Main> {
     Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => Login())
+    );
+  }
+
+  _abrirCadastro(){
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Cadastro())
     );
   }
 
@@ -105,6 +113,7 @@ class _MainState extends State<Main> {
                   ),
                 ),
               ),
+              onTap: _abrirCadastro,
             ),
           ),
           Positioned(
